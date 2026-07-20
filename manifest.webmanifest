@@ -1,0 +1,16 @@
+{
+  "name": "いろどりパレット(配色を10秒で)",
+  "short_name": "いろどり",
+  "description": "色をひとつ選ぶだけで調和する5色の配色パレットを自動生成。和の伝統色見本帳つき",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F7F5FA",
+  "theme_color": "#7B5EA7",
+  "lang": "ja",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

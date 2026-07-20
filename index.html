@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#7B5EA7">
+<title>いろどりパレット — 配色パレット自動生成・和の伝統色見本帳</title>
+<meta name="description" content="色をひとつ選ぶだけで、調和する5色の配色パレットを自動生成。気分で選べる見本帳・和の伝統色一覧・文字の見やすさチェック付き。デザイン・資料作り・ハンドメイドの色選びに。無料・登録不要。">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="いろどり">
+</head>
+<body>
+<style>
+:root{
+  --bg:#F7F5FA; --surface:#FFFFFF; --ink:#2E2838; --muted:#7A7288;
+  --line:#E5E0EE; --accent:#7B5EA7; --accent-ink:#FFFFFF; --accent-soft:#EFEAF7;
+  --warn:#B0563B; --warn-soft:#F6E9E3; --chip:#ECE8F3; --ok:#3E7A52; --okbg:#E5F0E9;
+  --shadow:0 1px 3px rgba(60,45,90,.08);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#1A1721; --surface:#252030; --ink:#E9E4F2; --muted:#A69DB8;
+    --line:#3A3348; --accent:#B49BE0; --accent-ink:#221640; --accent-soft:#352B48;
+    --warn:#D69073; --warn-soft:#3A2A21; --chip:#322B42; --ok:#7FBE97; --okbg:#233A2C;
+    --shadow:0 1px 3px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="light"]{
+  --bg:#F7F5FA; --surface:#FFFFFF; --ink:#2E2838; --muted:#7A7288;
+  --line:#E5E0EE; --accent:#7B5EA7; --accent-ink:#FFFFFF; --accent-soft:#EFEAF7;
+  --warn:#B0563B; --warn-soft:#F6E9E3; --chip:#ECE8F3; --ok:#3E7A52; --okbg:#E5F0E9;
+  --shadow:0 1px 3px rgba(60,45,90,.08);
+}
+:root[data-theme="dark"]{
+  --bg:#1A1721; --surface:#252030; --ink:#E9E4F2; --muted:#A69DB8;
+  --line:#3A3348; --accent:#B49BE0; --accent-ink:#221640; --accent-soft:#352B48;
+  --warn:#D69073; --warn-soft:#3A2A21; --chip:#322B42; --ok:#7FBE97; --okbg:#233A2C;
+  --shadow:0 1px 3px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{background:var(--bg); color:var(--ink);
+  font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic UI","Noto Sans JP",Meiryo,sans-serif;
+  font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  height:100%; overflow:hidden;}
+/* iframe埋め込み時、iOS Safari等でposition:fixedがiframeのスクロール位置ではなく
+   ドキュメント全体を基準に位置決めされる不具合対策。
+   html,bodyは自身をスクロールさせず、#scroll-area内側だけをスクロールさせる。
+   nav.tabsとトーストはposition:absoluteでbody基準に固定する */
+body{position:relative;}
+#scroll-area{height:100%; overflow-y:auto; -webkit-overflow-scrolling:touch;}
+#app{max-width:720px; margin:0 auto; padding:0 14px 84px;}
+header.top{position:sticky; top:0; z-index:20; background:var(--bg);
+  padding:10px 2px 8px; display:flex; align-items:center; gap:10px; border-bottom:1px solid var(--line);}
+header.top h1{font-size:18px; font-weight:700; letter-spacing:.02em;}
+header.top .sub{color:var(--muted); font-size:13px; margin-left:auto;}
+main{padding-top:12px;}
+h2{font-size:14.5px; font-weight:700; letter-spacing:.04em; margin:14px 0 6px;}
+.small{font-size:12.5px; color:var(--muted);}
+.card{background:var(--surface); border:1px solid var(--line); border-radius:10px; box-shadow:var(--shadow); padding:11px 13px; margin-bottom:9px;}
+button{font:inherit; cursor:pointer; border:none; border-radius:8px; padding:8px 14px; background:var(--chip); color:var(--ink);}
+button:focus-visible, input:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+button.primary{background:var(--accent); color:var(--accent-ink); font-weight:700;}
+button.ghost{background:transparent; border:1px solid var(--line);}
+nav.tabs{position:absolute; bottom:0; left:0; right:0; z-index:30; background:var(--surface); border-top:1px solid var(--line); display:flex; justify-content:center;}
+nav.tabs .inner{display:flex; width:100%; max-width:720px;}
+nav.tabs button{flex:1; background:none; border-radius:0; padding:10px 0 12px; font-size:11.5px; color:var(--muted); display:flex; flex-direction:column; gap:2px; align-items:center;}
+nav.tabs button .ic{font-size:18px; line-height:1;}
+nav.tabs button.on{color:var(--accent); font-weight:700;}
+.f-row{margin:10px 0;}
+.f-row:first-child{margin-top:0;}
+.f-row .lbl{font-size:12.5px; color:var(--muted); font-weight:700; letter-spacing:.05em; margin-bottom:5px;}
+.seg{display:flex; flex-wrap:wrap; gap:6px;}
+.seg button{padding:6px 12px; font-size:13px; border:1px solid var(--line); background:var(--surface); border-radius:8px;}
+.seg button.on{background:var(--accent); color:var(--accent-ink); border-color:var(--accent); font-weight:700;}
+.row{display:flex; flex-wrap:wrap; gap:8px; align-items:center;}
+/* base color picker */
+.basepick{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+.basepick input[type="color"]{width:52px; height:40px; border:1px solid var(--line); border-radius:8px; background:var(--surface); padding:2px; cursor:pointer;}
+.basepick input[type="text"]{font:inherit; width:110px; padding:8px 10px; border:1px solid var(--line); border-radius:8px; background:var(--surface); color:var(--ink); text-transform:uppercase; letter-spacing:.05em;}
+/* palette */
+.pal{display:flex; border-radius:12px; overflow:hidden; border:1px solid var(--line); min-height:120px;}
+.pal .sw{flex:1; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; padding:10px 2px; cursor:pointer; border:none; border-radius:0; gap:2px; transition:flex .15s;}
+.pal .sw:hover{flex:1.35;}
+.pal .sw .hx{font-size:11px; font-weight:700; letter-spacing:.02em; font-family:Consolas,Menlo,monospace;}
+.pal .sw .cp{font-size:10px; opacity:.75;}
+.palbtns{display:flex; flex-wrap:wrap; gap:7px; margin-top:9px;}
+.palbtns button{font-size:12.5px; padding:7px 11px;}
+/* preview mock */
+.pv{border-radius:12px; overflow:hidden; border:1px solid var(--line);}
+.pv .pv-head{padding:10px 14px; font-weight:700; font-size:14px;}
+.pv .pv-body{padding:14px;}
+.pv .pv-card{border-radius:10px; padding:12px 14px;}
+.pv .pv-title{font-weight:800; font-size:16px; margin-bottom:3px;}
+.pv .pv-text{font-size:12.5px; line-height:1.6;}
+.pv .pv-btnrow{display:flex; gap:8px; margin-top:10px; align-items:center;}
+.pv .pv-btn{border-radius:8px; padding:7px 16px; font-size:12.5px; font-weight:700; border:none; cursor:default;}
+.pv .pv-chip{border-radius:999px; padding:4px 12px; font-size:11.5px; font-weight:600;}
+.ctr-row{display:flex; gap:8px; align-items:center; margin-top:8px; font-size:12.5px; flex-wrap:wrap;}
+.badge{display:inline-block; border-radius:999px; padding:2px 10px; font-size:11.5px; font-weight:700;}
+.badge.ok{background:var(--okbg); color:var(--ok);}
+.badge.ng{background:var(--warn-soft); color:var(--warn);}
+/* preset rows */
+.prow{display:flex; align-items:center; gap:10px; padding:8px 2px; border-bottom:1px solid var(--line);}
+.prow:last-child{border-bottom:none;}
+.prow .strip{display:flex; flex:0 0 130px; height:34px; border-radius:8px; overflow:hidden; border:1px solid var(--line);}
+.prow .strip span{flex:1;}
+.prow .pnm{flex:1; min-width:0; font-size:13.5px; font-weight:600;}
+.prow .pnm .s{display:block; font-size:11.5px; color:var(--muted); font-weight:400;}
+.prow button{font-size:12px; padding:6px 10px; flex-shrink:0;}
+/* wa-colors */
+.wagrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:7px;}
+.wa{display:flex; align-items:center; gap:8px; border:1px solid var(--line); border-radius:9px; padding:6px 8px; background:var(--surface);}
+.wa .copybit{display:flex; align-items:center; gap:8px; flex:1; min-width:0; background:none; border:none; padding:0; cursor:pointer; text-align:left; color:var(--ink); border-radius:0;}
+.wa .dot{width:30px; height:30px; border-radius:7px; flex-shrink:0; border:1px solid rgba(0,0,0,.08);}
+.wa .nm{font-size:12.5px; font-weight:700; line-height:1.25;}
+.wa .nm .yomi{display:block; font-size:10px; color:var(--muted); font-weight:400;}
+.wa .nm .hx{display:block; font-size:10px; color:var(--muted); font-family:Consolas,Menlo,monospace;}
+.wa .usebit{flex-shrink:0; font-size:11px; padding:5px 8px;}
+/* favorites */
+.emptybox{text-align:center; color:var(--muted); font-size:13px; padding:22px 10px;}
+/* toast */
+#toast{position:absolute; bottom:76px; left:50%; transform:translateX(-50%); background:var(--ink); color:var(--bg);
+  padding:8px 18px; border-radius:999px; font-size:13px; z-index:50; opacity:0; pointer-events:none; transition:opacity .2s; white-space:nowrap;}
+#toast.show{opacity:.94;}
+@media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important;} }
+</style>
+
+<div id="scroll-area">
+  <div id="app">
+    <header class="top"><h1>いろどりパレット</h1><span class="sub">配色を10秒で</span></header>
+    <main>
+      <section id="tab-make"></section>
+      <section id="tab-book" hidden></section>
+      <section id="tab-fav" hidden></section>
+      <section id="tab-settings" hidden></section>
+    </main>
+  </div>
+</div>
+<nav class="tabs"><div class="inner">
+  <button data-tab="make" class="on"><span class="ic">🎨</span>つくる</button>
+  <button data-tab="book"><span class="ic">📖</span>見本帳</button>
+  <button data-tab="fav"><span class="ic">❤️</span>保存</button>
+  <button data-tab="settings"><span class="ic">⚙️</span>設定</button>
+</div></nav>
+<div id="toast"></div>
+
+<script>
+"use strict";
+/* ============================================================
+   いろどりパレット — 配色パレット自動生成
+   リライト不要設計: 色彩理論(色相環・明度・コントラスト計算)と
+   和の伝統色は不変の知識のみで構成。変わりうる情報は持たない。
+   ============================================================ */
+
+/* ---------- 色変換ユーティリティ ---------- */
+function hexToRgb(hex){
+  const m=/^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if(!m) return null;
+  const n=parseInt(m[1],16);
+  return [n>>16&255, n>>8&255, n&255];
+}
+function rgbToHex(r,g,b){
+  return "#"+[r,g,b].map(v=>Math.round(Math.max(0,Math.min(255,v))).toString(16).padStart(2,"0")).join("").toUpperCase();
+}
+function rgbToHsl(r,g,b){
+  r/=255; g/=255; b/=255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b), d=max-min;
+  let h=0;
+  if(d!==0){
+    if(max===r) h=((g-b)/d)%6;
+    else if(max===g) h=(b-r)/d+2;
+    else h=(r-g)/d+4;
+    h*=60; if(h<0) h+=360;
+  }
+  const l=(max+min)/2;
+  const s=d===0?0:d/(1-Math.abs(2*l-1));
+  return [h, s*100, l*100];
+}
+function hslToHex(h,s,l){
+  h=((h%360)+360)%360; s=Math.max(0,Math.min(100,s))/100; l=Math.max(0,Math.min(100,l))/100;
+  const c=(1-Math.abs(2*l-1))*s, x=c*(1-Math.abs((h/60)%2-1)), m=l-c/2;
+  let r=0,g=0,b=0;
+  if(h<60){r=c;g=x;} else if(h<120){r=x;g=c;} else if(h<180){g=c;b=x;}
+  else if(h<240){g=x;b=c;} else if(h<300){r=x;b=c;} else {r=c;b=x;}
+  return rgbToHex((r+m)*255,(g+m)*255,(b+m)*255);
+}
+function hexToHsl(hex){ const rgb=hexToRgb(hex); return rgb?rgbToHsl(...rgb):null; }
+function relLum(hex){
+  const [r,g,b]=hexToRgb(hex).map(v=>{
+    v/=255; return v<=0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4);
+  });
+  return 0.2126*r+0.7152*g+0.0722*b;
+}
+function contrast(hex1,hex2){
+  const l1=relLum(hex1), l2=relLum(hex2);
+  return (Math.max(l1,l2)+0.05)/(Math.min(l1,l2)+0.05);
+}
+function textOn(hex){ return contrast(hex,"#FFFFFF")>=contrast(hex,"#000000") ? "#FFFFFF" : "#000000"; }
+function clamp(v,lo,hi){ return Math.max(lo,Math.min(hi,v)); }
+
+/* ---------- 配色生成(色彩理論ベース・決定的) ---------- */
+const MODES=[
+  {id:"omakase", label:"おまかせ", desc:"ベース色を軸に、背景・メイン・アクセントまで揃うバランス型"},
+  {id:"analog",  label:"類似色",   desc:"色相環の隣どうし。まとまりが出て失敗しにくい"},
+  {id:"comp",    label:"補色",     desc:"正反対の色を差し色に。メリハリが出る"},
+  {id:"triad",   label:"トライアド", desc:"色相環を3等分。にぎやかでポップな印象"},
+  {id:"mono",    label:"濃淡",     desc:"1色の明るさ違い。上品で統一感のある印象"},
+  {id:"pastel",  label:"パステル", desc:"やわらかい淡色5色。かわいい系・ふんわり系に"},
+  {id:"dull",    label:"くすみ",   desc:"彩度を抑えたニュアンスカラー。大人っぽい印象"}
+];
+function makePalette(baseHex, mode){
+  const [h,s0,l0]=hexToHsl(baseHex);
+  const s=clamp(s0, 8, 92);
+  switch(mode){
+    case "analog":{
+      const ss=clamp(s,35,70);
+      return [ [h-30,ss,82],[h-15,ss,68],[h,clamp(s,40,80),54],[h+15,ss,44],[h+30,ss,32] ].map(a=>hslToHex(...a));
+    }
+    case "comp":{
+      return [ [h,clamp(s*.5,15,40),88],[h,s,66],[h,clamp(s,45,85),48],[h+180,clamp(s,45,80),58],[h+180,clamp(s*.7,25,60),80] ].map(a=>hslToHex(...a));
+    }
+    case "triad":{
+      return [ [h,clamp(s*.55,18,45),84],[h,clamp(s,45,80),52],[h+120,clamp(s,40,75),56],[h+240,clamp(s,40,75),56],[h,clamp(s,40,70),30] ].map(a=>hslToHex(...a));
+    }
+    case "mono":{
+      return [90,72,55,40,26].map(l=>hslToHex(h,s,l));
+    }
+    case "pastel":{
+      return [0,1,2,3,4].map(i=>hslToHex(h+i*68, clamp(s,40,60), 85));
+    }
+    case "dull":{
+      const ds=clamp(s*.35,14,28);
+      return [ [h-25,ds,80],[h-10,ds,64],[h,ds,50],[h+12,ds,38],[h+25,ds,28] ].map(a=>hslToHex(...a));
+    }
+    default:{ /* omakase */
+      return [ [h,clamp(s*.45,15,40),90],[h+14,clamp(s,40,70),70],[h,clamp(s,45,85),52],[h+150,clamp(s,40,75),58],[h,clamp(s*.8,25,60),24] ].map(a=>hslToHex(...a));
+    }
+  }
+}
+function randomBase(){
+  const h=Math.floor(Math.random()*360);
+  const s=45+Math.floor(Math.random()*40);
+  const l=40+Math.floor(Math.random()*30);
+  return hslToHex(h,s,l);
+}
+
+/* ---------- 見本帳: 気分パレット(不変のキュレーション) ---------- */
+const PRESETS=[
+  {n:"ふんわりパステル", s:"かわいい・やさしい", c:["#F9D9E7","#FCEBD8","#FBF5D5","#DCEEDD","#D8E4F4"]},
+  {n:"さくらもち",       s:"和・春・かわいい",   c:["#FEDFE1","#F8C3CD","#E87A90","#8E354A","#F4F7F4"]},
+  {n:"ラベンダードリーム", s:"ゆめかわ・上品",   c:["#F5EFFF","#E5D9F2","#CDC1FF","#A594F9","#7371FC"]},
+  {n:"くすみピンク",     s:"大人かわいい",       c:["#F9E4E4","#EFC7C2","#D19C97","#9E7676","#6E4555"]},
+  {n:"カフェラテ",       s:"ナチュラル・落ち着き", c:["#EDE0D4","#E6CCB2","#DDB892","#B08968","#7F5539"]},
+  {n:"ナチュラルアース", s:"素朴・オーガニック", c:["#F0EAD2","#DDE5B6","#ADC178","#A98467","#6C584C"]},
+  {n:"フォレスト",       s:"緑・癒やし",         c:["#D8F3DC","#B7E4C7","#52B788","#2D6A4F","#1B4332"]},
+  {n:"深海グラデ",       s:"青・清潔感",         c:["#CAF0F8","#90E0EF","#00B4D8","#0077B6","#03045E"]},
+  {n:"北欧スタイル",     s:"シンプル・モダン",   c:["#FFFFFF","#BFC0C0","#EF8354","#4F5D75","#2D3142"]},
+  {n:"レトロポップ",     s:"喫茶店・昭和レトロ", c:["#E9C46A","#F4A261","#E76F51","#2A9D8F","#264653"]},
+  {n:"ビタミンポップ",   s:"元気・こども向け",   c:["#FF6B6B","#FFD93D","#6BCB77","#4D96FF","#B983FF"]},
+  {n:"サンセット",       s:"夕暮れ・エモい",     c:["#FFCDB2","#FFB4A2","#E5989B","#B5838D","#6D6875"]},
+  {n:"和モダン",         s:"和風・凛とした",     c:["#F8F4E6","#D0AF4C","#B7282E","#165E83","#595857"]},
+  {n:"大人シック",       s:"上品・秋冬",         c:["#F2E9E4","#C9ADA7","#9A8C98","#4A4E69","#22223B"]},
+  {n:"ミッドナイト",     s:"夜・スタイリッシュ", c:["#FFFFFE","#EEBBC3","#B8C1EC","#232946","#0F0E17"]},
+  {n:"モノトーン",       s:"無彩色・ミニマル",   c:["#F5F5F5","#D4D4D4","#8E8E8E","#3D3D3D","#111111"]}
+];
+
+/* ---------- 見本帳: 和の伝統色(不変の文化データ) ---------- */
+const WACOLORS=[
+  ["桜色","さくらいろ","#FEF4F4"],["撫子色","なでしこいろ","#EEBBCB"],["桃色","ももいろ","#F09199"],
+  ["躑躅色","つつじいろ","#E95295"],["牡丹色","ぼたんいろ","#E7609E"],["薄紅","うすべに","#F0908D"],
+  ["紅色","べにいろ","#D7003A"],["茜色","あかねいろ","#B7282E"],["朱色","しゅいろ","#EB6101"],
+  ["珊瑚色","さんごいろ","#F5B1AA"],["柿色","かきいろ","#ED6D3D"],["橙色","だいだいいろ","#EE7800"],
+  ["山吹色","やまぶきいろ","#F8B500"],["向日葵色","ひまわりいろ","#FCC800"],["芥子色","からしいろ","#D0AF4C"],
+  ["琥珀色","こはくいろ","#BF783A"],["茶色","ちゃいろ","#965042"],["小豆色","あずきいろ","#96514D"],
+  ["亜麻色","あまいろ","#D6C6AF"],["生成り色","きなりいろ","#FBFAF5"],["象牙色","ぞうげいろ","#F8F4E6"],
+  ["若草色","わかくさいろ","#C3D825"],["萌黄","もえぎ","#AACF53"],["抹茶色","まっちゃいろ","#C5C56A"],
+  ["若竹色","わかたけいろ","#68BE8D"],["常磐色","ときわいろ","#007B43"],["深緑","ふかみどり","#00552E"],
+  ["青磁色","せいじいろ","#7EBEAB"],["新橋色","しんばしいろ","#59B9C6"],["浅葱色","あさぎいろ","#00A3AF"],
+  ["水色","みずいろ","#BCE2E8"],["空色","そらいろ","#A0D8EF"],["勿忘草色","わすれなぐさいろ","#89C3EB"],
+  ["露草色","つゆくさいろ","#38A1DB"],["瑠璃色","るりいろ","#1E50A2"],["群青色","ぐんじょういろ","#4C6CB3"],
+  ["藍色","あいいろ","#165E83"],["紺色","こんいろ","#223A70"],["藤色","ふじいろ","#A59ACA"],
+  ["菫色","すみれいろ","#7058A3"],["桔梗色","ききょういろ","#5654A2"],["江戸紫","えどむらさき","#745399"],
+  ["利休鼠","りきゅうねずみ","#888E7E"],["銀鼠","ぎんねず","#AFAFB0"],["鈍色","にびいろ","#727171"],
+  ["墨色","すみいろ","#595857"],["白練","しろねり","#F3F3F2"],["漆黒","しっこく","#0D0015"]
+];
+
+/* ---------- 状態 ---------- */
+const $=s=>document.querySelector(s);
+function esc(s){ return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+const LS_KEY="irodori-v1";
+function loadFavs(){
+  try{ const d=JSON.parse(localStorage.getItem(LS_KEY)); return Array.isArray(d?.favs)?d.favs:[]; }
+  catch(e){ return []; }
+}
+function saveFavs(favs){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify({favs})); }catch(e){}
+}
+let state={
+  base:"#7B5EA7",
+  mode:"omakase",
+  colors:null,          // 現在表示中の5色
+  bookSeg:"mood"        // 見本帳のサブタブ
+};
+/* 共有リンク(#c=RRGGBB,...)から復元 */
+(function initFromHash(){
+  const m=/[#&]c=([0-9a-fA-F,]+)/.exec(location.hash);
+  if(!m) return;
+  const cols=m[1].split(",").filter(x=>/^[0-9a-fA-F]{6}$/.test(x)).map(x=>"#"+x.toUpperCase());
+  if(cols.length===5){ state.colors=cols; state.base=cols[2]; }
+})();
+if(!state.colors) state.colors=makePalette(state.base, state.mode);
+
+let toastTimer=null;
+function toast(msg){
+  const t=$("#toast");
+  t.textContent=msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove("show"), 1600);
+}
+function copyText(text, msg){
+  const done=()=>toast(msg||"コピーしました");
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>{ fallbackCopy(text); done(); });
+  }else{ fallbackCopy(text); done(); }
+}
+function fallbackCopy(text){
+  const ta=document.createElement("textarea");
+  ta.value=text; ta.style.position="absolute"; ta.style.left="-9999px";
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); }catch(e){}
+  ta.remove();
+}
+
+/* ---------- 役割の自動割り当て(プレビュー用) ---------- */
+function assignRoles(colors){
+  const byLum=[...colors].sort((a,b)=>relLum(b)-relLum(a));
+  const bg=byLum[0], ink=byLum[byLum.length-1];
+  const mids=byLum.slice(1,-1);
+  const bySat=[...mids].sort((a,b)=>hexToHsl(b)[1]-hexToHsl(a)[1]);
+  const main=bySat[0]||colors[2];
+  const accent=bySat[1]||colors[3];
+  const sub=bySat[2]||colors[1];
+  return {bg, ink, main, accent, sub};
+}
+
+/* ---------- つくるタブ ---------- */
+function renderMake(){
+  const el=$("#tab-make");
+  const cols=state.colors;
+  const modeObj=MODES.find(m=>m.id===state.mode);
+  const r=assignRoles(cols);
+  const ratio=contrast(r.ink, r.bg);
+  const ratioTxt=(Math.round(ratio*10)/10).toFixed(1);
+  const grade=ratio>=7?["◎ とても見やすい","ok"]:ratio>=4.5?["○ 見やすい(AA基準)","ok"]:ratio>=3?["△ 大きな文字向き","ng"]:["✕ 読みにくい組み合わせ","ng"];
+  el.innerHTML=`
+  <div class="card">
+    <div class="f-row"><div class="lbl">ベースの色をえらぶ</div>
+      <div class="basepick">
+        <input type="color" id="basePicker" value="${esc(state.base)}" aria-label="ベースの色">
+        <input type="text" id="baseHex" value="${esc(state.base)}" maxlength="7" spellcheck="false" aria-label="カラーコード">
+        <button id="btnRandom">🎲 ランダム</button>
+      </div></div>
+    <div class="f-row" style="margin-bottom:2px"><div class="lbl">配色のタイプ</div>
+      <div class="seg" id="modeSeg">${MODES.map(m=>`<button data-v="${m.id}" class="${state.mode===m.id?"on":""}">${esc(m.label)}</button>`).join("")}</div>
+      <p class="small" style="margin-top:5px">${esc(modeObj.desc)}</p></div>
+  </div>
+  <div class="card">
+    <div class="pal" id="palRow">${cols.map((c,i)=>`
+      <button class="sw" data-i="${i}" style="background:${c}; color:${textOn(c)}" title="タップでコピー">
+        <span class="hx">${c}</span><span class="cp">タップでコピー</span>
+      </button>`).join("")}</div>
+    <div class="palbtns">
+      <button id="btnCopyAll">HEXまとめてコピー</button>
+      <button id="btnCopyCss">CSS変数でコピー</button>
+      <button id="btnPng">🖼 画像で保存</button>
+      <button id="btnFav">❤️ 保存</button>
+      <button id="btnShare">🔗 共有リンク</button>
+    </div>
+  </div>
+  <h2>この配色をつかうと…</h2>
+  <div class="card">
+    <div class="pv" style="background:${r.bg}">
+      <div class="pv-head" style="background:${r.main}; color:${textOn(r.main)}">サイトのヘッダー</div>
+      <div class="pv-body">
+        <div class="pv-card" style="background:${r.sub}; color:${textOn(r.sub)}">
+          <div class="pv-title" style="color:${r.ink}">見出しのテキスト</div>
+          <div class="pv-text" style="color:${r.ink}">本文のテキストはこんな見え方になります。背景×文字の相性もここで確認できます。</div>
+          <div class="pv-btnrow">
+            <span class="pv-btn" style="background:${r.accent}; color:${textOn(r.accent)}">ボタン</span>
+            <span class="pv-chip" style="background:${r.main}; color:${textOn(r.main)}">タグ</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ctr-row">
+      <span class="small">文字の見やすさ(背景 ${esc(r.bg)} × 文字 ${esc(r.ink)}):</span>
+      <span class="badge ${grade[1]}">${grade[0]}</span>
+      <span class="small">コントラスト比 ${ratioTxt} : 1</span>
+    </div>
+  </div>
+  <p class="small">💡 使い方のコツ: いちばん薄い色を「背景」、いちばん濃い色を「文字」、鮮やかな色を「ボタンや見出しの差し色」にすると、だいたいうまくいきます。</p>`;
+
+  $("#basePicker").oninput=e=>{ setBase(e.target.value); };
+  $("#baseHex").onchange=e=>{
+    let v=e.target.value.trim(); if(!v.startsWith("#")) v="#"+v;
+    if(hexToRgb(v)) setBase(v.toUpperCase()); else { toast("「#」+6桁のカラーコードで入力してね"); e.target.value=state.base; }
+  };
+  $("#btnRandom").onclick=()=>{ setBase(randomBase()); };
+  el.querySelectorAll("#modeSeg button").forEach(b=>b.onclick=()=>{ state.mode=b.dataset.v; regen(); });
+  el.querySelectorAll(".pal .sw").forEach(b=>b.onclick=()=>{ copyText(cols[+b.dataset.i], cols[+b.dataset.i]+" をコピーしました"); });
+  $("#btnCopyAll").onclick=()=>copyText(cols.join(", "));
+  $("#btnCopyCss").onclick=()=>{
+    const roles=assignRoles(cols);
+    const css=`:root{\n  --color-bg: ${roles.bg};\n  --color-sub: ${roles.sub};\n  --color-main: ${roles.main};\n  --color-accent: ${roles.accent};\n  --color-ink: ${roles.ink};\n}`;
+    copyText(css, "CSS変数をコピーしました");
+  };
+  $("#btnPng").onclick=()=>downloadPng(cols);
+  $("#btnFav").onclick=()=>{
+    const favs=loadFavs();
+    if(favs.some(f=>f.c.join()===cols.join())){ toast("この配色は保存済みです"); return; }
+    favs.unshift({c:cols, t:Date.now()});
+    if(favs.length>50) favs.pop();
+    saveFavs(favs);
+    toast("❤️ 保存しました");
+  };
+  $("#btnShare").onclick=()=>{
+    const base=location.origin+location.pathname;
+    copyText(base+"#c="+cols.map(c=>c.slice(1)).join(","), "共有リンクをコピーしました");
+  };
+}
+function setBase(hex){ state.base=hex; regen(); }
+function regen(){ state.colors=makePalette(state.base, state.mode); renderMake(); }
+
+/* ---------- 画像で保存(Canvas→PNG) ---------- */
+function downloadPng(cols){
+  const W=1000, H=520, cw=W/cols.length;
+  const cv=document.createElement("canvas"); cv.width=W; cv.height=H;
+  const ctx=cv.getContext("2d");
+  cols.forEach((c,i)=>{
+    ctx.fillStyle=c; ctx.fillRect(i*cw,0,cw+1,440);
+    ctx.fillStyle=textOn(c);
+    ctx.font="bold 26px Consolas, Menlo, monospace";
+    ctx.textAlign="center";
+    ctx.fillText(c, i*cw+cw/2, 410);
+  });
+  ctx.fillStyle="#FFFFFF"; ctx.fillRect(0,440,W,80);
+  ctx.fillStyle="#666666"; ctx.font="24px sans-serif"; ctx.textAlign="center";
+  ctx.fillText("いろどりパレット", W/2, 490);
+  const a=document.createElement("a");
+  a.download="palette-"+cols.map(c=>c.slice(1)).join("-")+".png";
+  a.href=cv.toDataURL("image/png");
+  a.click();
+  toast("画像を保存しました");
+}
+
+/* ---------- 見本帳タブ ---------- */
+function renderBook(){
+  const el=$("#tab-book");
+  let html=`<div class="seg" style="margin-bottom:10px">
+    <button data-v="mood" class="${state.bookSeg==="mood"?"on":""}">気分でえらぶ</button>
+    <button data-v="wa" class="${state.bookSeg==="wa"?"on":""}">和の伝統色</button>
+  </div>`;
+  if(state.bookSeg==="mood"){
+    html+=`<p class="small" style="margin-bottom:6px">気になるパレットは「つかう」で読み込んで、プレビューやコピーができます。</p>
+    <div class="card">${PRESETS.map((p,i)=>`
+      <div class="prow">
+        <div class="strip">${p.c.map(c=>`<span style="background:${c}"></span>`).join("")}</div>
+        <div class="pnm">${esc(p.n)}<span class="s">${esc(p.s)}</span></div>
+        <button data-use="${i}" class="primary">つかう</button>
+      </div>`).join("")}</div>`;
+  }else{
+    html+=`<p class="small" style="margin-bottom:6px">日本の伝統色48色。タップでカラーコードをコピー、「つかう」でこの色からパレットを作れます。</p>
+    <div class="wagrid">${WACOLORS.map((w,i)=>`
+      <div class="wa">
+        <button class="copybit" data-wa="${i}" title="タップでコピー">
+          <span class="dot" style="background:${w[2]}"></span>
+          <span class="nm">${esc(w[0])}<span class="yomi">${esc(w[1])}</span><span class="hx">${w[2]}</span></span>
+        </button>
+        <button class="usebit" data-wause="${i}">つかう</button>
+      </div>`).join("")}</div>
+    <p class="small" style="margin-top:8px">※ 伝統色の色値は資料により少し差があります。広く使われている代表的な値を採用しています。</p>`;
+  }
+  el.innerHTML=html;
+  el.querySelectorAll(".seg [data-v]").forEach(b=>b.onclick=()=>{ state.bookSeg=b.dataset.v; renderBook(); });
+  el.querySelectorAll("[data-use]").forEach(b=>b.onclick=()=>{
+    const p=PRESETS[+b.dataset.use];
+    state.colors=[...p.c]; state.base=p.c[2];
+    tab="make"; render();
+    $("#scroll-area").scrollTo({top:0, behavior:"smooth"});
+    toast(`「${p.n}」を読み込みました`);
+  });
+  el.querySelectorAll("[data-wa]").forEach(b=>{
+    const w=WACOLORS[+b.dataset.wa];
+    b.onclick=()=>copyText(w[2], `${w[0]} ${w[2]} をコピーしました`);
+  });
+  el.querySelectorAll("[data-wause]").forEach(b=>{
+    const w=WACOLORS[+b.dataset.wause];
+    b.onclick=()=>{
+      state.base=w[2]; state.colors=makePalette(w[2], state.mode);
+      tab="make"; render();
+      $("#scroll-area").scrollTo({top:0, behavior:"smooth"});
+      toast(`${w[0]}からパレットを作りました`);
+    };
+  });
+}
+
+/* ---------- 保存タブ ---------- */
+function renderFav(){
+  const el=$("#tab-fav");
+  const favs=loadFavs();
+  if(favs.length===0){
+    el.innerHTML=`<div class="card"><div class="emptybox">まだ保存した配色がありません。<br>「つくる」タブで気に入ったパレットを ❤️ 保存すると、ここに並びます。</div></div>`;
+    return;
+  }
+  el.innerHTML=`<p class="small" style="margin-bottom:6px">保存した配色(この端末の中だけに保存されます)</p>
+  <div class="card">${favs.map((f,i)=>`
+    <div class="prow">
+      <div class="strip">${f.c.map(c=>`<span style="background:${c}"></span>`).join("")}</div>
+      <div class="pnm"><span class="s">${new Date(f.t).toLocaleDateString("ja-JP")}</span></div>
+      <button data-load="${i}" class="primary">ひらく</button>
+      <button data-del="${i}" class="ghost">削除</button>
+    </div>`).join("")}</div>`;
+  el.querySelectorAll("[data-load]").forEach(b=>b.onclick=()=>{
+    const f=favs[+b.dataset.load];
+    state.colors=[...f.c]; state.base=f.c[2];
+    tab="make"; render();
+    $("#scroll-area").scrollTo({top:0, behavior:"smooth"});
+  });
+  el.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{
+    favs.splice(+b.dataset.del,1); saveFavs(favs); renderFav();
+    toast("削除しました");
+  });
+}
+
+/* ---------- 設定タブ ---------- */
+function renderSettings(){
+  const el=$("#tab-settings");
+  el.innerHTML=`
+  <div class="card">
+    <h2 style="margin-top:0">このアプリについて</h2>
+    <p class="small">色をひとつ選ぶだけで、色彩理論(色相環)に沿った調和する5色の配色パレットを自動生成するアプリです。ブログ・資料・ハンドメイド・イラストなどの色選びにどうぞ。</p>
+    <p class="small" style="margin-top:6px">保存した配色はこの端末のブラウザの中だけに保存され、外部に送信されることはありません。一度開けばオフラインでも使えます。</p>
+  </div>
+  <div class="card">
+    <h2 style="margin-top:0">まめ知識</h2>
+    <p class="small">・配色は「<b>ベース(背景)70% : メイン25% : アクセント5%</b>」の割合にすると整って見えます(70:25:5の法則)。</p>
+    <p class="small" style="margin-top:4px">・文字と背景の<b>コントラスト比は4.5:1以上</b>が読みやすさの国際基準(WCAG AA)。「つくる」タブのプレビューで自動判定しています。</p>
+    <p class="small" style="margin-top:4px">・迷ったら「濃淡」か「類似色」を選ぶと失敗しません。</p>
+  </div>
+  <div class="card">
+    <h2 style="margin-top:0">データの初期化</h2>
+    <p class="small" style="margin-bottom:8px">保存した配色をすべて削除します。</p>
+    <button id="btnReset" class="ghost">保存データを全部消す</button>
+  </div>`;
+  $("#btnReset").onclick=()=>{
+    if(confirm("保存した配色をすべて削除します。よろしいですか?")){
+      saveFavs([]); toast("初期化しました");
+    }
+  };
+}
+
+/* ---------- タブ・起動 ---------- */
+let tab="make";
+/* ?t=make|book|wa|fav|settings で開くタブを指定できる(ブログからの深掘りリンク用) */
+{
+  const tm=/[?&#]t=([a-z]+)/.exec(location.search+location.hash);
+  if(tm){
+    if(tm[1]==="wa"){ tab="book"; state.bookSeg="wa"; }
+    else if(["make","book","fav","settings"].includes(tm[1])) tab=tm[1];
+  }
+}
+document.querySelectorAll("nav.tabs button").forEach(b=>{
+  b.addEventListener("click",()=>{ tab=b.dataset.tab; render(); });
+});
+function render(){
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
+  ["make","book","fav","settings"].forEach(t=>{ $("#tab-"+t).hidden=(t!==tab); });
+  if(tab==="make") renderMake();
+  if(tab==="book") renderBook();
+  if(tab==="fav") renderFav();
+  if(tab==="settings") renderSettings();
+}
+render();
+</script>
+<script>
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js");
+</script>
+</body>
+</html>
