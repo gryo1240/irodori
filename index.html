@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#7B5EA7">
+<meta name="theme-color" content="#F4F3EF">
 <title>いろどりパレット — 配色パレット自動生成・和の伝統色見本帳</title>
 <meta name="description" content="色をひとつ選ぶだけで、調和する5色の配色パレットを自動生成。気分で選べる見本帳・和の伝統色一覧・文字の見やすさチェック付き。デザイン・資料作り・ハンドメイドの色選びに。無料・登録不要。">
 <link rel="manifest" href="./manifest.webmanifest">
@@ -12,34 +12,36 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="いろどり">
+<script src="jp-phrase-3.js" defer></script>
 </head>
 <body>
 <style>
+/* ===== 2026-09-28 刷新:「印刷の色校正紙（トンボ・カラーバー）」 =====
+   見せ場は1つ: 作った5色を、校正紙の端に刷るカラーバーとして組み、四隅にトンボ（断ち切りの目印）を付ける。
+   ほかは墨の細い罫と校正の赤の2色だけ。色コードは等幅の書体。絵文字は使わない */
 :root{
-  --bg:#F7F5FA; --surface:#FFFFFF; --ink:#2E2838; --muted:#7A7288;
-  --line:#E5E0EE; --accent:#7B5EA7; --accent-ink:#FFFFFF; --accent-soft:#EFEAF7;
-  --warn:#B0563B; --warn-soft:#F6E9E3; --chip:#ECE8F3; --ok:#3E7A52; --okbg:#E5F0E9;
-  --shadow:0 1px 3px rgba(60,45,90,.08);
+  --bg:#F4F3EF; --surface:#FFFFFF; --ink:#1E1E1E; --muted:#66645E;
+  --line:#CFCDC6; --accent:#C8322A; --accent-ink:#FFFFFF; --accent-soft:#F7E6E4;
+  --warn:#B0563B; --warn-soft:#F6E9E3; --chip:#ECEBE6; --ok:#2F6B45; --okbg:#E3EFE6;
+  --mono:Consolas,Menlo,"Courier New",monospace;
+  --shadow:none;
 }
 @media (prefers-color-scheme: dark){
   :root{
-    --bg:#1A1721; --surface:#252030; --ink:#E9E4F2; --muted:#A69DB8;
-    --line:#3A3348; --accent:#B49BE0; --accent-ink:#221640; --accent-soft:#352B48;
-    --warn:#D69073; --warn-soft:#3A2A21; --chip:#322B42; --ok:#7FBE97; --okbg:#233A2C;
-    --shadow:0 1px 3px rgba(0,0,0,.35);
+    --bg:#18181A; --surface:#222224; --ink:#ECEBE6; --muted:#A6A49D;
+    --line:#3A3A3D; --accent:#EE7A70; --accent-ink:#2A0B08; --accent-soft:#3A2624;
+    --warn:#D69073; --warn-soft:#3A2A21; --chip:#2E2E31; --ok:#86C59C; --okbg:#1F3326;
   }
 }
 :root[data-theme="light"]{
-  --bg:#F7F5FA; --surface:#FFFFFF; --ink:#2E2838; --muted:#7A7288;
-  --line:#E5E0EE; --accent:#7B5EA7; --accent-ink:#FFFFFF; --accent-soft:#EFEAF7;
-  --warn:#B0563B; --warn-soft:#F6E9E3; --chip:#ECE8F3; --ok:#3E7A52; --okbg:#E5F0E9;
-  --shadow:0 1px 3px rgba(60,45,90,.08);
+  --bg:#F4F3EF; --surface:#FFFFFF; --ink:#1E1E1E; --muted:#66645E;
+  --line:#CFCDC6; --accent:#C8322A; --accent-ink:#FFFFFF; --accent-soft:#F7E6E4;
+  --warn:#B0563B; --warn-soft:#F6E9E3; --chip:#ECEBE6; --ok:#2F6B45; --okbg:#E3EFE6;
 }
 :root[data-theme="dark"]{
-  --bg:#1A1721; --surface:#252030; --ink:#E9E4F2; --muted:#A69DB8;
-  --line:#3A3348; --accent:#B49BE0; --accent-ink:#221640; --accent-soft:#352B48;
-  --warn:#D69073; --warn-soft:#3A2A21; --chip:#322B42; --ok:#7FBE97; --okbg:#233A2C;
-  --shadow:0 1px 3px rgba(0,0,0,.35);
+  --bg:#18181A; --surface:#222224; --ink:#ECEBE6; --muted:#A6A49D;
+  --line:#3A3A3D; --accent:#EE7A70; --accent-ink:#2A0B08; --accent-soft:#3A2624;
+  --warn:#D69073; --warn-soft:#3A2A21; --chip:#2E2E31; --ok:#86C59C; --okbg:#1F3326;
 }
 *{box-sizing:border-box; margin:0; padding:0;}
 html,body{background:var(--bg); color:var(--ink);
@@ -53,80 +55,108 @@ html,body{background:var(--bg); color:var(--ink);
 body{position:relative;}
 #scroll-area{height:100%; overflow-y:auto; -webkit-overflow-scrolling:touch;}
 #app{max-width:720px; margin:0 auto; padding:0 14px 84px;}
+/* 表題の下の罫は、校正紙の端のカラーバー（CMYKと墨の濃淡） */
 header.top{position:sticky; top:0; z-index:20; background:var(--bg);
-  padding:10px 2px 8px; display:flex; align-items:center; gap:10px; border-bottom:1px solid var(--line);}
-header.top h1{font-size:18px; font-weight:700; letter-spacing:.02em;}
-header.top .sub{color:var(--muted); font-size:13px; margin-left:auto;}
+  padding:9px 2px 7px; display:flex; align-items:center; gap:10px; border-bottom:3px solid transparent;
+  border-image:linear-gradient(90deg, #00A0E0 0 10%, #E4007F 10% 20%, #FFE100 20% 30%, #1E1E1E 30% 40%, #555 40% 50%, #888 50% 60%, #BBB 60% 70%, #E4E4E4 70% 80%, transparent 80%) 1;}
+header.top h1{font-size:18px; font-weight:700; letter-spacing:.06em;}
+header.top .sub{color:var(--muted); font-size:13px; margin-left:auto; font-family:var(--mono); letter-spacing:.04em;}
 main{padding-top:12px;}
-h2{font-size:14.5px; font-weight:700; letter-spacing:.04em; margin:14px 0 6px;}
+h2{font-size:14.5px; font-weight:700; letter-spacing:.06em; margin:14px 0 6px;}
 .small{font-size:12.5px; color:var(--muted);}
-.card{background:var(--surface); border:1px solid var(--line); border-radius:10px; box-shadow:var(--shadow); padding:11px 13px; margin-bottom:9px;}
-button{font:inherit; cursor:pointer; border:none; border-radius:8px; padding:8px 14px; background:var(--chip); color:var(--ink);}
+.card{position:relative; background:var(--surface); border:1px solid var(--line); border-radius:0; padding:9px 13px; margin-bottom:9px;}
+button{font:inherit; cursor:pointer; border:none; border-radius:0; padding:8px 14px; background:var(--chip); color:var(--ink);}
 button:focus-visible, input:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
-button.primary{background:var(--accent); color:var(--accent-ink); font-weight:700;}
-button.ghost{background:transparent; border:1px solid var(--line);}
-nav.tabs{position:absolute; bottom:0; left:0; right:0; z-index:30; background:var(--surface); border-top:1px solid var(--line); display:flex; justify-content:center;}
+button.primary{background:var(--ink); color:var(--surface); font-weight:700;}
+button.ghost{background:transparent; border:1px solid var(--ink);}
+nav.tabs{position:absolute; bottom:0; left:0; right:0; z-index:30; background:var(--surface); border-top:1px solid var(--ink); display:flex; justify-content:center;}
 nav.tabs .inner{display:flex; width:100%; max-width:720px;}
-nav.tabs button{flex:1; background:none; border-radius:0; padding:10px 0 12px; font-size:11.5px; color:var(--muted); display:flex; flex-direction:column; gap:2px; align-items:center;}
-nav.tabs button .ic{font-size:18px; line-height:1;}
+nav.tabs button{flex:1; background:none; border-radius:0; padding:9px 0 11px; font-size:11.5px; color:var(--muted); display:flex; flex-direction:column; gap:3px; align-items:center;}
 nav.tabs button.on{color:var(--accent); font-weight:700;}
+/* 線のアイコン */
+.ic{display:inline-block; width:20px; height:20px; background:currentColor; flex:none; -webkit-mask:var(--m) center/contain no-repeat; mask:var(--m) center/contain no-repeat;}
+@supports not ((mask-image:none) or (-webkit-mask-image:none)){ .ic{display:none;} }
+.ic-bars{--m:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linejoin='round'><rect x='3' y='7' width='18' height='10'/><path d='M7.5 7v10M12 7v10M16.5 7v10'/></svg>");}
+.ic-book{--m:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linejoin='round'><path d='M4 5.5c3-1.5 5.5-1.5 8 0v14c-2.5-1.5-5-1.5-8 0z'/><path d='M20 5.5c-3-1.5-5.5-1.5-8 0v14c2.5-1.5 5-1.5 8 0z'/></svg>");}
+.ic-pin{--m:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linejoin='round'><path d='M6 3h12v18l-6-4-6 4z'/></svg>");}
+.ic-gear{--m:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'><circle cx='12' cy='12' r='3.2'/><path d='M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1'/></svg>");}
 .f-row{margin:10px 0;}
 .f-row:first-child{margin-top:0;}
 .f-row .lbl{font-size:12.5px; color:var(--muted); font-weight:700; letter-spacing:.05em; margin-bottom:5px;}
 .seg{display:flex; flex-wrap:wrap; gap:6px;}
-.seg button{padding:6px 12px; font-size:13px; border:1px solid var(--line); background:var(--surface); border-radius:8px;}
-.seg button.on{background:var(--accent); color:var(--accent-ink); border-color:var(--accent); font-weight:700;}
+.seg button{padding:6px 12px; font-size:13px; border:1px solid var(--line); background:var(--surface); border-radius:0;}
+.seg button.on{background:var(--surface); color:var(--accent); border-color:var(--accent); box-shadow:inset 0 -3px 0 var(--accent); font-weight:700;}
 .row{display:flex; flex-wrap:wrap; gap:8px; align-items:center;}
 /* base color picker */
 .basepick{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
-.basepick input[type="color"]{width:52px; height:40px; border:1px solid var(--line); border-radius:8px; background:var(--surface); padding:2px; cursor:pointer;}
-.basepick input[type="text"]{font:inherit; width:110px; padding:8px 10px; border:1px solid var(--line); border-radius:8px; background:var(--surface); color:var(--ink); text-transform:uppercase; letter-spacing:.05em;}
-/* palette */
-.pal{display:flex; border-radius:12px; overflow:hidden; border:1px solid var(--line); min-height:120px;}
+.basepick input[type="color"]{width:52px; height:40px; border:1px solid var(--ink); border-radius:0; background:var(--surface); padding:2px; cursor:pointer;}
+.basepick input[type="text"]{font:inherit; font-family:var(--mono); width:110px; padding:8px 10px; border:1px solid var(--ink); border-radius:0; background:var(--surface); color:var(--ink); text-transform:uppercase; letter-spacing:.06em;}
+/* ---- カラーバー（配色）＋四隅のトンボ ---- */
+/* トンボは紙面の外側（#app の余白）に描くので、左右の余白は取らない（幅300pxで5色目の色コードが切れないように） */
+.proof{margin:7px 0 9px;}
+.proof::before{content:""; position:absolute; inset:-8px; pointer-events:none;
+  background:
+    linear-gradient(var(--ink),var(--ink)) 0 7px/6px 1px no-repeat,
+    linear-gradient(var(--ink),var(--ink)) 7px 0/1px 6px no-repeat,
+    linear-gradient(var(--ink),var(--ink)) 100% 7px/6px 1px no-repeat,
+    linear-gradient(var(--ink),var(--ink)) calc(100% - 7px) 0/1px 6px no-repeat,
+    linear-gradient(var(--ink),var(--ink)) 0 calc(100% - 7px)/6px 1px no-repeat,
+    linear-gradient(var(--ink),var(--ink)) 7px 100%/1px 6px no-repeat,
+    linear-gradient(var(--ink),var(--ink)) 100% calc(100% - 7px)/6px 1px no-repeat,
+    linear-gradient(var(--ink),var(--ink)) calc(100% - 7px) 100%/1px 6px no-repeat;}
+.pal{display:flex; border-radius:0; overflow:hidden; border:1px solid var(--ink); min-height:120px;}
 .pal .sw{flex:1; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; padding:10px 2px; cursor:pointer; border:none; border-radius:0; gap:2px; transition:flex .15s;}
+.pal .sw + .sw{box-shadow:inset 1px 0 0 rgba(0,0,0,.35);}
+/* 5色を必ず5等分に（「タップで／コピー」が文節で折らない単位になると最小幅が広がり、狭い幅で5色目がはみ出す） */
+.pal .sw{min-width:0;}
 .pal .sw:hover{flex:1.35;}
-.pal .sw .hx{font-size:11px; font-weight:700; letter-spacing:.02em; font-family:Consolas,Menlo,monospace;}
+.pal .sw .hx{font-size:11px; font-weight:700; letter-spacing:.02em; font-family:var(--mono);}
 .pal .sw .cp{font-size:10px; opacity:.75;}
-.palbtns{display:flex; flex-wrap:wrap; gap:7px; margin-top:9px;}
-.palbtns button{font-size:12.5px; padding:7px 11px;}
+.palbtns{display:flex; flex-wrap:wrap; gap:6px; margin-top:9px;}
+.palbtns button{font-size:12.5px; padding:6px 10px; background:transparent; border:1px solid var(--ink);}
 /* preview mock */
-.pv{border-radius:12px; overflow:hidden; border:1px solid var(--line);}
+.pv{border-radius:0; overflow:hidden; border:1px solid var(--ink);}
 .pv .pv-head{padding:10px 14px; font-weight:700; font-size:14px;}
 .pv .pv-body{padding:14px;}
-.pv .pv-card{border-radius:10px; padding:12px 14px;}
+.pv .pv-card{border-radius:4px; padding:12px 14px;}
 .pv .pv-title{font-weight:800; font-size:16px; margin-bottom:3px;}
 .pv .pv-text{font-size:12.5px; line-height:1.6;}
 .pv .pv-btnrow{display:flex; gap:8px; margin-top:10px; align-items:center;}
-.pv .pv-btn{border-radius:8px; padding:7px 16px; font-size:12.5px; font-weight:700; border:none; cursor:default;}
+.pv .pv-btn{border-radius:4px; padding:7px 16px; font-size:12.5px; font-weight:700; border:none; cursor:default;}
 .pv .pv-chip{border-radius:999px; padding:4px 12px; font-size:11.5px; font-weight:600;}
 .ctr-row{display:flex; gap:8px; align-items:center; margin-top:8px; font-size:12.5px; flex-wrap:wrap;}
-.badge{display:inline-block; border-radius:999px; padding:2px 10px; font-size:11.5px; font-weight:700;}
-.badge.ok{background:var(--okbg); color:var(--ok);}
-.badge.ng{background:var(--warn-soft); color:var(--warn);}
+.badge{display:inline-block; border-radius:0; padding:1px 8px; font-size:11.5px; font-weight:700; border:1px solid currentColor;}
+.badge.ok{background:transparent; color:var(--ok);}
+.badge.ng{background:transparent; color:var(--accent);}
 /* preset rows */
 .prow{display:flex; align-items:center; gap:10px; padding:8px 2px; border-bottom:1px solid var(--line);}
 .prow:last-child{border-bottom:none;}
-.prow .strip{display:flex; flex:0 0 130px; height:34px; border-radius:8px; overflow:hidden; border:1px solid var(--line);}
+.prow .strip{display:flex; flex:0 0 130px; height:30px; border-radius:0; overflow:hidden; border:1px solid var(--ink);}
 .prow .strip span{flex:1;}
 .prow .pnm{flex:1; min-width:0; font-size:13.5px; font-weight:600;}
 .prow .pnm .s{display:block; font-size:11.5px; color:var(--muted); font-weight:400;}
 .prow button{font-size:12px; padding:6px 10px; flex-shrink:0;}
+/* 狭い幅では色帯を細くして、パレット名（最長9字）を1行に入れる */
+@media (max-width:399px){ .prow .strip{flex-basis:90px;} }
+@media (max-width:359px){ .prow .strip{flex-basis:44px;} .prow .pnm{font-size:13px;} }
 /* wa-colors */
-.wagrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:7px;}
-.wa{display:flex; align-items:center; gap:8px; border:1px solid var(--line); border-radius:9px; padding:6px 8px; background:var(--surface);}
+.wagrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:6px;}
+.wa{display:flex; align-items:center; gap:8px; border:1px solid var(--line); border-radius:0; padding:6px 8px; background:var(--surface);}
 .wa .copybit{display:flex; align-items:center; gap:8px; flex:1; min-width:0; background:none; border:none; padding:0; cursor:pointer; text-align:left; color:var(--ink); border-radius:0;}
-.wa .dot{width:30px; height:30px; border-radius:7px; flex-shrink:0; border:1px solid rgba(0,0,0,.08);}
+.wa .dot{width:30px; height:30px; border-radius:0; flex-shrink:0; border:1px solid rgba(0,0,0,.3);}
 .wa .nm{font-size:12.5px; font-weight:700; line-height:1.25;}
 .wa .nm .yomi{display:block; font-size:10px; color:var(--muted); font-weight:400;}
-.wa .nm .hx{display:block; font-size:10px; color:var(--muted); font-family:Consolas,Menlo,monospace;}
-.wa .usebit{flex-shrink:0; font-size:11px; padding:5px 8px;}
+.wa .nm .hx{display:block; font-size:10px; color:var(--muted); font-family:var(--mono);}
+.wa .usebit{flex-shrink:0; font-size:11px; padding:5px 8px; border:1px solid var(--ink); background:transparent;}
 /* favorites */
 .emptybox{text-align:center; color:var(--muted); font-size:13px; padding:22px 10px;}
 /* toast */
 #toast{position:absolute; bottom:76px; left:50%; transform:translateX(-50%); background:var(--ink); color:var(--bg);
-  padding:8px 18px; border-radius:999px; font-size:13px; z-index:50; opacity:0; pointer-events:none; transition:opacity .2s; white-space:nowrap;}
+  padding:8px 18px; border-radius:0; font-size:13px; z-index:50; opacity:0; pointer-events:none; transition:opacity .2s; white-space:nowrap;}
 #toast.show{opacity:.94;}
 @media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important;} }
+@media (forced-colors: active){ .ic{forced-color-adjust:none; background:ButtonText;} nav.tabs button.on .ic{background:Highlight;} }
+@media (forced-colors: active){ .proof::before{forced-color-adjust:none;} header.top{border-image:none; border-bottom:3px solid CanvasText;} }
 </style>
 
 <div id="scroll-area">
@@ -141,10 +171,10 @@ nav.tabs button.on{color:var(--accent); font-weight:700;}
   </div>
 </div>
 <nav class="tabs"><div class="inner">
-  <button data-tab="make" class="on"><span class="ic">🎨</span>つくる</button>
-  <button data-tab="book"><span class="ic">📖</span>見本帳</button>
-  <button data-tab="fav"><span class="ic">❤️</span>保存</button>
-  <button data-tab="settings"><span class="ic">⚙️</span>設定</button>
+  <button data-tab="make" class="on"><span class="ic ic-bars" aria-hidden="true"></span>つくる</button>
+  <button data-tab="book"><span class="ic ic-book" aria-hidden="true"></span>見本帳</button>
+  <button data-tab="fav"><span class="ic ic-pin" aria-hidden="true"></span>保存</button>
+  <button data-tab="settings"><span class="ic ic-gear" aria-hidden="true"></span>設定</button>
 </div></nav>
 <div id="toast"></div>
 
@@ -363,13 +393,13 @@ function renderMake(){
       <div class="basepick">
         <input type="color" id="basePicker" value="${esc(state.base)}" aria-label="ベースの色">
         <input type="text" id="baseHex" value="${esc(state.base)}" maxlength="7" spellcheck="false" aria-label="カラーコード">
-        <button id="btnRandom">🎲 ランダム</button>
+        <button id="btnRandom">ランダム</button>
       </div></div>
     <div class="f-row" style="margin-bottom:2px"><div class="lbl">配色のタイプ</div>
       <div class="seg" id="modeSeg">${MODES.map(m=>`<button data-v="${m.id}" class="${state.mode===m.id?"on":""}">${esc(m.label)}</button>`).join("")}</div>
       <p class="small" style="margin-top:5px">${esc(modeObj.desc)}</p></div>
   </div>
-  <div class="card">
+  <div class="card proof">
     <div class="pal" id="palRow">${cols.map((c,i)=>`
       <button class="sw" data-i="${i}" style="background:${c}; color:${textOn(c)}" title="タップでコピー">
         <span class="hx">${c}</span><span class="cp">タップでコピー</span>
@@ -377,9 +407,9 @@ function renderMake(){
     <div class="palbtns">
       <button id="btnCopyAll">HEXまとめてコピー</button>
       <button id="btnCopyCss">CSS変数でコピー</button>
-      <button id="btnPng">🖼 画像で保存</button>
-      <button id="btnFav">❤️ 保存</button>
-      <button id="btnShare">🔗 共有リンク</button>
+      <button id="btnPng">画像で保存</button>
+      <button id="btnFav">保存</button>
+      <button id="btnShare">共有リンク</button>
     </div>
   </div>
   <h2>この配色をつかうと…</h2>
@@ -403,7 +433,7 @@ function renderMake(){
       <span class="small">コントラスト比 ${ratioTxt} : 1</span>
     </div>
   </div>
-  <p class="small">💡 使い方のコツ: いちばん薄い色を「背景」、いちばん濃い色を「文字」、鮮やかな色を「ボタンや見出しの差し色」にすると、だいたいうまくいきます。</p>`;
+  <p class="small">使い方のコツ: いちばん薄い色を「背景」、いちばん濃い色を「文字」、鮮やかな色を「ボタンや見出しの差し色」にすると、だいたいうまくいきます。</p>`;
 
   $("#basePicker").oninput=e=>{ setBase(e.target.value); };
   $("#baseHex").onchange=e=>{
@@ -426,7 +456,7 @@ function renderMake(){
     favs.unshift({c:cols, t:Date.now()});
     if(favs.length>50) favs.pop();
     saveFavs(favs);
-    toast("❤️ 保存しました");
+    toast("保存しました");
   };
   $("#btnShare").onclick=()=>{
     const base=location.origin+location.pathname;
@@ -514,7 +544,7 @@ function renderFav(){
   const el=$("#tab-fav");
   const favs=loadFavs();
   if(favs.length===0){
-    el.innerHTML=`<div class="card"><div class="emptybox">まだ保存した配色がありません。<br>「つくる」タブで気に入ったパレットを ❤️ 保存すると、ここに並びます。</div></div>`;
+    el.innerHTML=`<div class="card"><div class="emptybox">まだ保存した配色がありません。<br>「つくる」タブで気に入ったパレットを保存すると、ここに並びます。</div></div>`;
     return;
   }
   el.innerHTML=`<p class="small" style="margin-bottom:6px">保存した配色(この端末の中だけに保存されます)</p>
